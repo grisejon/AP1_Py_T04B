@@ -1,0 +1,105 @@
+# Tic-Tac-Toe Backend Guide
+
+## Installation and Setup
+1. Initialize environment and install dependencies:
+   ```bash
+   make init
+   ```
+2. Configure the database in `src/.env`:
+   ```env
+   DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+   ```
+3. Start the application:
+   ```bash
+   python src/main.py
+   ```
+
+## API Usage Guide
+
+### 1. User Registration
+**Endpoint:** `POST /signup`
+**Example curl:**
+```bash
+curl -X POST http://localhost:5000/signup \
+     -H "Content-Type: application/json" \
+     -d '{"login": "player1", "password": "password123"}'
+```
+
+### 2. Authorization
+**Endpoint:** `POST /login`
+**Header:** `Authorization: Basic <base64(login:password)>`
+**Example curl:**
+```bash
+curl -X POST http://localhost:5000/login \
+     -H "Authorization: Basic cGxheWVyMTpwYXNzd29yZDEyMw=="
+```
+**Response:** Returns the user's UUID.
+
+### 3. Creating and Joining Games
+**Important:** All following endpoints require the `Authorization` header.
+
+- **Create Game:** `POST /game/create`
+**Example curl:**
+```bash
+curl -X POST http://localhost:5000/game/create \
+     -H "Authorization: Basic cGxheWVyMTpwYXNzd29yZDEyMw==" \
+     -H "Content-Type: application/json" \
+     -d '{"against_computer": true}'
+```
+
+- **List Available Games:** `GET /games`
+**Example curl:**
+```bash
+curl -X GET http://localhost:5000/games \
+     -H "Authorization: Basic cGxheWVyMTpwYXNzd29yZDEyMw=="
+```
+
+- **List All Games:** `GET /game/list`
+**Example curl:**
+```bash
+curl -X GET http://localhost:5000/game/list \
+     -H "Authorization: Basic cGxheWVyMTpwYXNzd29yZDEyMw=="
+```
+
+- **Join Game:** `POST /game/join`
+**Example curl:**
+```bash
+curl -X POST http://localhost:5000/game/join \
+     -H "Authorization: Basic cGxheWVyMTpwYXNzd29yZDEyMw==" \
+     -H "Content-Type: application/json" \
+     -d '{"game_id": "uuid-of-the-game"}'
+```
+
+### 4. Gameplay
+**Endpoint:** `POST /game/<game_id>`
+**Example curl:**
+```bash
+curl -X POST http://localhost:5000/game/uuid-of-the-game \
+     -H "Authorization: Basic cGxheWVyMTpwYXNzd29yZDEyMw==" \
+     -H "Content-Type: application/json" \
+     -d '{"board": [[1, 0, 0], [0, 0, 0], [0, 0, 0]]}'
+```
+
+### 5. Game and User Info
+- **Get Game State:** `GET /game/<game_id>`
+**Example curl:**
+```bash
+curl -X GET http://localhost:5000/game/uuid-of-the-game \
+     -H "Authorization: Basic cGxheWVyMTpwYXNzd29yZDEyMw=="
+```
+
+- **Get User Info:** `GET /user/<user_id>`
+**Example curl:**
+```bash
+curl -X GET http://localhost:5000/user/uuid-of-the-user \
+     -H "Authorization: Basic cGxheWVyMTpwYXNzd29yZDEyMw=="
+```
+
+## Makefile Helpers
+You can use the following make commands for quick interaction:
+- `make init`: Setup venv and install requirements.
+- `make setup`: Registers a user and provides an `AUTH_TOKEN` export command.
+- `make create_game`: Prints the curl command to create a game.
+- `make join_game`: Prints the curl command to join a game.
+- `make make_move`: Prints the curl command to make a move.
+- `make clean`: Removes venv and python cache.
